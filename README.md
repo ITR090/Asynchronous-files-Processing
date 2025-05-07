@@ -46,7 +46,7 @@ This project demonstrates an event-driven, asynchronous file processing pipeline
 ```
 cd client
 npm install
-npm start
+npm run dev
 ```
 
 4. Start Node.js Backend
@@ -54,7 +54,7 @@ npm start
 ```
 cd server
 npm install
-node index.js
+npm run start
 ```
 
 ---
