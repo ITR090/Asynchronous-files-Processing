@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './App.css'
+// lib
+import api from './lib/axios';
 
 function App() {
 
@@ -8,42 +10,46 @@ function App() {
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState(null)
-  console.log(feedback)
+
   const handleUpload = async () => {
 
     try {
       setLoading(true);
       const formData = new FormData();
       formData.append("file", file);
-      console.log(formData)
-      const backendUrl = process.env.NODE_ENV == 'development' ? 'http://localhost:8080' : '';
-      console.log(backendUrl)
-      const response = await axios.post(`${backendUrl}/upload`, formData);
-      console.log(response)
+
+      const response = await api.post(`/upload`, formData);
+      
       if (response.status === 200) {
         setFeedback({
           type: "success",
           message: response.data.message,
         })
-        //alert(response.data.message);
       }
+
     } catch (error) {
+      
       if (error.status === 400) {
         setFeedback({
           type: "error",
-          message: error.message,
+          message: error.response.data.eer_message,
         })
-       //alert(error.message)
-      }
-      if (error.status === 500) {
+      } else if (error.status === 500) {
         setFeedback({
           type: "error",
-          message: error.message,
+          message: error.response.data.eer_message,
         })
-        //alert(error.message)
+      } else {
+        console.log(error)
+        setFeedback({
+          type: "error",
+          message: error.response.data.eer_message,
+        })
       }
     } finally {
       setLoading(false);
+      setFile(null);
+      setSelected(null);
     }
 
   };
@@ -76,7 +82,7 @@ function App() {
       </div>)}
 
 
-    
+
 
     </div>
   );

@@ -26,7 +26,7 @@
     COPY server/ .
     
     # Copy built frontend into backend
-    COPY --from=build-frontend /app/client/build ./build
+    COPY --from=build-frontend /app/client/dist ./dist
     
     # Expose server port
     EXPOSE 5000
