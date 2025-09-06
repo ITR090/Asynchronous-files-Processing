@@ -27,7 +27,8 @@ This project demonstrates an event-driven, asynchronous file processing pipeline
 - **Cloud Services**:
   - Google Cloud Storage (GCS)
   - Cloud Pub/Sub
-  - Cloud Functions
+  - Cloud Run Functions
+  - Cloud Run
 
 ---
 
@@ -60,13 +61,12 @@ npm run start
 ---
 
 ## ✅ Cloud Function Logic
-* Resizes image to predefined dimensions (e.g., 800x600)
-* Applies basic filters (e.g., grayscale, sharpen)
-* Uses libraries like sharp or jimp inside the function
+* Resizes image logic
+* Applies basic filters 
 
 ---
 
 ## 📌 Notes
 
 * Ensure billing is enabled on GCP.
-* Enable required APIs: Cloud Storage, Pub/Sub, and Cloud Functions.
+* Enable required APIs: Cloud Storage, Pub/Sub, and Cloud Run Functions.
