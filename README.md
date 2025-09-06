@@ -29,6 +29,7 @@ This project demonstrates an event-driven, asynchronous file processing pipeline
   - Cloud Pub/Sub
   - Cloud Run Functions
   - Cloud Run
+  - Cloud Logging
 
 ---
 
