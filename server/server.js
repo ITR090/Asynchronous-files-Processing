@@ -33,7 +33,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 app.post('/api/upload', upload.single('file'), async (req, res) => {
 
   try {
-    console.log(req)
+    // console.log(req)
     if (!req.file) {
       //console.log('No file uploaded');
       return res.status(400).json({ eer_message: 'No file uploaded' });
@@ -86,6 +86,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
   }
 
 });
+
 
 
 app.listen(5000, () => console.log("Listening on port 5000"));
