@@ -22,7 +22,7 @@
   - resize-image-funcation
 ---
 
-## 🚀 Setup & Deployment
+## 🚀 Setup
 
 1. Create GCP Account and Enable Billing.
 2. Start React Frontend:

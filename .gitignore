@@ -5,3 +5,4 @@ backend-api/.env
 backend-api/asynchronous-image-processing-f667c96c82c9.json
 cloudbuild.yaml
 dockerfile
+backend-api/image-processing-function.js
