@@ -1,73 +1,61 @@
-# Asynchronous Files Processing with React, Node.js, and Google Cloud
-
-This project demonstrates an event-driven, asynchronous file processing pipeline using **React** for the frontend, **Node.js** for the backend, and several **Google Cloud Platform** (GCP) services to handle file upload, resizing, and filtering.
+# GCP Serverless Playground
+---
+## Used GCP Services:
+   - Google Cloud Storage Buckets
+   - Cloud Pub/Sub
+   - Cloud Run Functions
+   - Cloud Run
+   - Cloud Logging
+   - APIs & Services Cloud vison API
+   - Cloud Firestore Databases
+   - IAM and Serviceaccounts
 
 ---
+## 📁 Folder Structure
 
-## ⚙️ Architecture Overview
-
-1. **React Frontend**: Users upload files via a web interface.
-2. **Node.js Backend (API)**: 
-   - Receives the file from React.
-   - Stores the file in a Google Cloud Storage (GCS) bucket.
-   - Publishes a message to an existing **Cloud Pub/Sub topic**.
-3. **Cloud Pub/Sub**: Relays the file processing task asynchronously.
-4. **Cloud Function**:
-   - Triggered by the Pub/Sub topic.
-   - Downloads the file from GCS.
-   - Applies resizing and filtering logic.
-   - Saves the processed file to another GCS bucket.
-
+- **frontend**: React files
+- **backend-api**: server.js + node_modules + .env + package-lock.json + package.json + ServiceAccount json file 
+- **cloud-functions**: 
+  - extract-text-function
+  - translate-text-function
+  - landmark-detection-funcation
+  - resize-image-funcation
 ---
-
-## 🧱 Tech Stack
-
-- **Frontend**: React
-- **Backend**: Node.js + Express
-- **Cloud Services**:
-  - Google Cloud Storage (GCS)
-  - Cloud Pub/Sub
-  - Cloud Run Functions
-  - Cloud Run
-  - Cloud Logging
-
----
-
-<!-- ## 📁 Folder Structure -->
-
 
 ## 🚀 Setup & Deployment
 
-1. Create GCP Account and Enable Billing
-
-2. Deploy Cloud Function
-
-
-3. Start React Frontend
-
+1. Create GCP Account and Enable Billing.
+2. Start React Frontend:
 ```
 cd client
 npm install
 npm run dev
 ```
-
-4. Start Node.js Backend
-
+3. Start Node.js Backend:
 ```
 cd server
 npm install
 npm run start
 ```
+4. Create .env file backend-api:
+```
+# GCP project id
+PROJECT_ID= your gcp project id
+# gcs buckets
+BUCKET_NAME= your cloud Storage bucket name 
+# pubsup topics
+TOPIC_NAME= 
+DOCUMENT_UPLOADED_TOPIC= pubsup topic for document upload
+There are other topics created based on events you can check them in /cloud-funcation folder
+# function urls
+PROCESS_MEATDATA_FUNCTION_HTTP=
+There are other functions created based on events you can check them in /cloud-funcation folder
+```
 
----
-
-## ✅ Cloud Function Logic
-* Resizes image logic
-* Applies basic filters 
+5. Generate a new Serviceaccounts with a key for generateSignedUrl funcation in backend-api folder server.js file.
 
 ---
 
 ## 📌 Notes
-
 * Ensure billing is enabled on GCP.
-* Enable required APIs: Cloud Storage, Pub/Sub, and Cloud Run Functions.
+* Enable required APIs such as: Cloud Storage, Pub/Sub, and Cloud Run Functions.

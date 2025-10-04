@@ -1,0 +1,44 @@
+steps:
+# Step 1: Build Docker image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    [
+      'build',
+      '-t',
+      'us-east1-docker.pkg.dev/asynchronous-image-processing/afp-repo/afp:$COMMIT_SHA',
+      '.'
+    ]
+
+# Step 2: Push Docker image to Artifact Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    [
+      'push',
+      'us-east1-docker.pkg.dev/asynchronous-image-processing/afp-repo/afp:$COMMIT_SHA'
+    ]
+
+# Step 3: Deploy to Cloud Run in us-east1
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+    [
+      'run',
+      'deploy',
+      'afp',
+      '--image',
+      'us-east1-docker.pkg.dev/asynchronous-image-processing/afp-repo/afp:$COMMIT_SHA',
+      '--region',
+      'us-east1',
+      '--platform',
+      'managed',
+      '--allow-unauthenticated'
+    ]
+
+images:
+- 'us-east1-docker.pkg.dev/asynchronous-image-processing/afp-repo/afp:$COMMIT_SHA'
+
+
+
+# gcloud builds submit \
+#   --pack image=us-east1-docker.pkg.dev/${GOOGLE_CLOUD_PROJECT}/app-repo/bookshelf \
+#   ~/bookshelf

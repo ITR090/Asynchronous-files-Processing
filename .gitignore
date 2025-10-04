@@ -1,4 +1,7 @@
-server/node_modules
+backend-api/node_modules
 client/node_modules
 client/.env
-server/.env
+backend-api/.env
+backend-api/asynchronous-image-processing-f667c96c82c9.json
+cloudbuild.yaml
+dockerfile
