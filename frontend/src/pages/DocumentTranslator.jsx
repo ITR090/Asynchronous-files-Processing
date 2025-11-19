@@ -17,7 +17,7 @@ export default function DocumentTranslator() {
             formData.append("file", file);
     
             // need to change the api endpoint
-            const response = await api.post(`/DocumentTranslator`, formData);
+            const response = await api.post(`/documentTranslator`, formData);
 
             if (response.status === 200) {
                 console.log(response.data)
@@ -26,7 +26,6 @@ export default function DocumentTranslator() {
                     message: response.data.message.data[0],
                     url: response.data.url
                 })
-
             }
 
         } catch (error) {

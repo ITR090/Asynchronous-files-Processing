@@ -6,8 +6,6 @@ import api from "../lib/axios";
 
 export default function LandMarkDetection() {
 
-
-
     const [loading, setLoading] = useState(false);
     const [feedback, setFeedback] = useState(null)
 
@@ -17,7 +15,7 @@ export default function LandMarkDetection() {
             setLoading(true);
             const formData = new FormData();
             formData.append("file", file);
-            const response = await api.post(`/uploadLandmarks`, formData);
+            const response = await api.post(`/uploadLandmark`, formData);
             console.log("response", response)
             if (response.status === 200) {
                 setFeedback({

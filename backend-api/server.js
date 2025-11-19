@@ -47,67 +47,67 @@ async function generateSignedUrl(bucketName, fileName) {
   return url;
 }
 
-app.post('/api/upload', upload.single('file'), async (req, res) => {
+// app.post('/api/upload', upload.single('file'), async (req, res) => {
 
-  try {
+//   try {
 
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
+//     if (!req.file) {
+//       return res.status(400).json({ message: 'No file uploaded' });
+//     }
 
-    const blob = storage.bucket(BUCKET_NAME).file(req.file.originalname);
-    const blobStream = blob.createWriteStream({
-      resumable: false,
-      metadata: {
-        contentType: req.file.mimetype,
-      },
-    });
+//     const blob = storage.bucket(BUCKET_NAME).file(req.file.originalname);
+//     const blobStream = blob.createWriteStream({
+//       resumable: false,
+//       metadata: {
+//         contentType: req.file.mimetype,
+//       },
+//     });
 
-    // if any error during streem 
-    blobStream.on('error', err => {
-      console.error('Upload error:', err);
-      return res.status(500).json({ message: 'Upload failed' });
-    });
+//     // if any error during streem 
+//     blobStream.on('error', err => {
+//       console.error('Upload error:', err);
+//       return res.status(500).json({ message: 'Upload failed' });
+//     });
 
-    // if no errors 
-    blobStream.on('finish', async () => {
+//     // if no errors 
+//     blobStream.on('finish', async () => {
 
-      const messageData = {
-        filename: req.file.originalname,
-        bucket: BUCKET_NAME,
-        contentType: req.file.mimetype,
-        action: 'resize',
-        // targetSizes: ['700x700'],
-        width: 700,
-        height: 700,
-        timestamp: Date.now()
-      };
+//       const messageData = {
+//         filename: req.file.originalname,
+//         bucket: BUCKET_NAME,
+//         contentType: req.file.mimetype,
+//         action: 'resize',
+//         // targetSizes: ['700x700'],
+//         width: 700,
+//         height: 700,
+//         timestamp: Date.now()
+//       };
 
-      try {
-        await pubsub.topic(TOPIC_NAME).publishMessage({ json: messageData });
-        console.log('Message published to ', TOPIC_NAME)
-        const url = await generateSignedUrl(BUCKET_NAME, `resized/${req.file.originalname}`);
-        res.status(200).json({
-          url: url,
-        });
-      } catch (error) {
-        console.error('Pub/Sub publish error:', error);
-        res.status(500).json({ message: 'Upload succeeded, but Pub/Sub failed' });
-      }
-    })
+//       try {
+//         await pubsub.topic(TOPIC_NAME).publishMessage({ json: messageData });
+//         console.log('Message published to ', TOPIC_NAME)
+//         const url = await generateSignedUrl(BUCKET_NAME, `resized/${req.file.originalname}`);
+//         res.status(200).json({
+//           url: url,
+//         });
+//       } catch (error) {
+//         console.error('Pub/Sub publish error:', error);
+//         res.status(500).json({ message: 'Upload succeeded, but Pub/Sub failed' });
+//       }
+//     })
 
-    blobStream.end(req.file.buffer);
-    req.file.buffer = null;
+//     blobStream.end(req.file.buffer);
+//     req.file.buffer = null;
 
-  } catch (error) {
-    console.log('No file uploaded catch');
-    res.status(500).json({ message: `${error} Try again later` });
-  }
+//   } catch (error) {
+//     console.log('No file uploaded catch');
+//     res.status(500).json({ message: `${error} Try again later` });
+//   }
 
-});
+// });
 
 
-app.post('/api/uploadLandmarks', upload.single('file'), async (req, res) => {
+app.post('/api/uploadLandmark', upload.single('file'), async (req, res) => {
 
   try {
 
@@ -134,7 +134,7 @@ app.post('/api/uploadLandmarks', upload.single('file'), async (req, res) => {
     blobStream.on('finish', async () => {
 
       try {
-        const cloudFunctionUrl = process.env.PROCESS_MEATDATA_FUNCTION_HTTP;
+        const cloudFunctionUrl = process.env.LANDMARK_DETECTION_FUNCTION_HTTP;
         const uploadedGcsUri = `gs://${BUCKET_NAME}/landmarks/${req.file.originalname}`;
         const cfResponse = await fetch(cloudFunctionUrl, {
           method: 'POST',
@@ -170,7 +170,7 @@ app.post('/api/uploadLandmarks', upload.single('file'), async (req, res) => {
 })
 
 
-app.post('/api/DocumentTranslator', upload.single('file'), async (req, res) => {
+app.post('/api/documentTranslator', upload.single('file'), async (req, res) => {
   try {
 
     // if no file
@@ -206,7 +206,6 @@ app.post('/api/DocumentTranslator', upload.single('file'), async (req, res) => {
 
          await pubsub.topic(process.env.DOCUMENT_UPLOADED_TOPIC).publishMessage({ json: messageData });
          
-
       } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Upload failed' });
