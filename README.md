@@ -16,10 +16,8 @@
 - **frontend**: React files
 - **backend-api**: server.js + node_modules + .env + package-lock.json + package.json + ServiceAccount json file 
 - **cloud-functions**: 
-  - extract-text-function
-  - translate-text-function
+  - extract-translate-text-function
   - landmark-detection-funcation
-  - resize-image-funcation
 ---
 
 ## 🚀 Setup
@@ -38,18 +36,19 @@ npm install
 npm run start
 ```
 4. Create .env file backend-api:
+
 ```
+# Port for backend server
+PORT=8080   
 # GCP project id
-PROJECT_ID= your gcp project id
+PROJECT_ID=
 # gcs buckets
-BUCKET_NAME= your cloud Storage bucket name 
-# pubsup topics
-TOPIC_NAME= 
-DOCUMENT_UPLOADED_TOPIC= pubsup topic for document upload
-There are other topics created based on events you can check them in /cloud-funcation folder
-# function urls
-PROCESS_MEATDATA_FUNCTION_HTTP=
-There are other functions created based on events you can check them in /cloud-funcation folder
+BUCKET_NAME=
+# function http urls
+# landmark detection function
+LANDMARK_DETECTION_FUNCTION_HTTP=
+# document translation function
+EXTRACT_TRANSLATE_TEXT_FUNCTION_HTTP=
 ```
 
 5. Generate a new Serviceaccounts with a key for generateSignedUrl funcation in backend-api folder server.js file.
@@ -58,4 +57,6 @@ There are other functions created based on events you can check them in /cloud-f
 
 ## 📌 Notes
 * Ensure billing is enabled on GCP.
-* Enable required APIs such as: Cloud Storage, Pub/Sub, and Cloud Run Functions.
+* Enable required APIs such as: Cloud Storage, Pub/Sub, Cloud Translation API and Cloud Run Functions.
+
+Vite Website : https://fullstack-app-afp-69338693715.europe-west1.run.app/

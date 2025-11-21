@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import Card from "../UI/Card";
 import FileUpload from "../UI/FileUpload";
 import api from "../lib/axios";
-
+// components
+import ErrorFeedback from "../components/ErrorFeedback";
+import Loading from "../components/Loading";
 
 export default function LandMarkDetection() {
 
@@ -16,7 +18,7 @@ export default function LandMarkDetection() {
             const formData = new FormData();
             formData.append("file", file);
             const response = await api.post(`/uploadLandmark`, formData);
-            console.log("response", response)
+            // console.log("response", response)
             if (response.status === 200) {
                 setFeedback({
                     status: "success",
@@ -26,7 +28,7 @@ export default function LandMarkDetection() {
             }
         } catch (error) {
             if (error.status === 400) {
-                console.log("error", error.response.data.message)
+                // console.log("error", error.response.data.message)
                 setFeedback({
                     status: "error",
                     message: error.response.data.message,
@@ -37,7 +39,7 @@ export default function LandMarkDetection() {
                     message: error.response.data.message,
                 })
             } else {
-                console.log(error)
+                // console.log(error)
                 setFeedback({
                     status: "error",
                     message: error.response.data.message
@@ -71,9 +73,7 @@ export default function LandMarkDetection() {
             </div>
 
 
-            {loading && <div className="w-fit flex flex-col justify-center items-center content-center mx-auto mt-5">
-                <span className="loading loading-spinner loading-xl"></span>
-            </div>}
+            {loading && <Loading />}
 
             {feedback?.status == "success" && <div className="card lg:card-side bg-base-100 shadow-sm mt-5">
                 <figure className="w-1/4">
@@ -97,15 +97,7 @@ export default function LandMarkDetection() {
             </div>}
 
 
-            {feedback?.status == "error" && <div className="card lg:card-side bg-base-200 shadow-sm mt-5">
-
-                <div role="alert" className="alert alert-error w-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{feedback?.message}</span>
-                </div>
-            </div>}
+            {feedback?.status == "error" && <ErrorFeedback message={feedback.message} />}
 
         </Card>
     )

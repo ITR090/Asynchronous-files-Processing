@@ -3,30 +3,22 @@ const multer = require('multer');
 require('dotenv').config();
 const cors = require('cors')
 const path = require('path')
+const axios = require('axios');
 const { Storage } = require('@google-cloud/storage');
-const { PubSub } = require('@google-cloud/pubsub');
 
 const app = express();
 app.use(express.json())
 app.use(cors())
 
+// Creates a client storage
+const storage = new Storage();
+// cloud storage bucket
+const BUCKET_NAME = process.env.BUCKET_NAME;
+
 // to server react frotent
 // this required so BE can know where are FE files .
 app.use(express.static(path.join(__dirname, 'dist')));
-console.log("GOOGLE_APPLICATION_CREDENTIALS:", process.env.GOOGLE_APPLICATION_CREDENTIALS);
-
-
-// project id
-const p_id = process.env.PROJECT_ID
-// cloud storage bucket
-const BUCKET_NAME = process.env.BUCKET_NAME;
-// cloud pubsup topic name
-const TOPIC_NAME = process.env.TOPIC_NAME;
-
-// Creates a client storage
-const storage = new Storage();
-// Creates a client pubsup
-const pubsub = new PubSub({ projectId: p_id });
+//console.log("GOOGLE_APPLICATION_CREDENTIALS:", process.env.GOOGLE_APPLICATION_CREDENTIALS);
 
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -47,65 +39,6 @@ async function generateSignedUrl(bucketName, fileName) {
   return url;
 }
 
-// app.post('/api/upload', upload.single('file'), async (req, res) => {
-
-//   try {
-
-//     if (!req.file) {
-//       return res.status(400).json({ message: 'No file uploaded' });
-//     }
-
-//     const blob = storage.bucket(BUCKET_NAME).file(req.file.originalname);
-//     const blobStream = blob.createWriteStream({
-//       resumable: false,
-//       metadata: {
-//         contentType: req.file.mimetype,
-//       },
-//     });
-
-//     // if any error during streem 
-//     blobStream.on('error', err => {
-//       console.error('Upload error:', err);
-//       return res.status(500).json({ message: 'Upload failed' });
-//     });
-
-//     // if no errors 
-//     blobStream.on('finish', async () => {
-
-//       const messageData = {
-//         filename: req.file.originalname,
-//         bucket: BUCKET_NAME,
-//         contentType: req.file.mimetype,
-//         action: 'resize',
-//         // targetSizes: ['700x700'],
-//         width: 700,
-//         height: 700,
-//         timestamp: Date.now()
-//       };
-
-//       try {
-//         await pubsub.topic(TOPIC_NAME).publishMessage({ json: messageData });
-//         console.log('Message published to ', TOPIC_NAME)
-//         const url = await generateSignedUrl(BUCKET_NAME, `resized/${req.file.originalname}`);
-//         res.status(200).json({
-//           url: url,
-//         });
-//       } catch (error) {
-//         console.error('Pub/Sub publish error:', error);
-//         res.status(500).json({ message: 'Upload succeeded, but Pub/Sub failed' });
-//       }
-//     })
-
-//     blobStream.end(req.file.buffer);
-//     req.file.buffer = null;
-
-//   } catch (error) {
-//     console.log('No file uploaded catch');
-//     res.status(500).json({ message: `${error} Try again later` });
-//   }
-
-// });
-
 
 app.post('/api/uploadLandmark', upload.single('file'), async (req, res) => {
 
@@ -114,6 +47,11 @@ app.post('/api/uploadLandmark', upload.single('file'), async (req, res) => {
     // if no file
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+     // if file type not image
+    if (!['image/jpeg', 'image/png'].includes(req.file.mimetype)) {
+      return res.status(400).json({ message: 'Invalid file type. Only JPEG, PNG allowed.' });
     }
 
     const blob = storage.bucket(BUCKET_NAME).file(`landmarks/${req.file.originalname}`);
@@ -178,6 +116,11 @@ app.post('/api/documentTranslator', upload.single('file'), async (req, res) => {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
+    // if file type not image
+    if (!['image/jpeg', 'image/png'].includes(req.file.mimetype)) {
+      return res.status(400).json({ message: 'Invalid file type. Only JPEG, PNG allowed.' });
+    }
+
     const blob = storage.bucket(BUCKET_NAME).file(`documents/${req.file.originalname}`);
     const blobStream = blob.createWriteStream({
       resumable: false,
@@ -204,7 +147,15 @@ app.post('/api/documentTranslator', upload.single('file'), async (req, res) => {
 
       try {
 
-         await pubsub.topic(process.env.DOCUMENT_UPLOADED_TOPIC).publishMessage({ json: messageData });
+       const cloudFunctionUrl_1 = process.env.EXTRACT_TRANSLATE_TEXT_FUNCTION_HTTP;
+       const gcsUri = `gs://${BUCKET_NAME}/documents/${req.file.originalname}`;
+
+       const response  = await  axios.post(cloudFunctionUrl_1 ,{
+        gcsUri: gcsUri,
+        targetLanguage: 'ar' // can be dynamic
+       }) 
+
+       res.status(200).json({ message: response.data });
          
       } catch (error) {
         console.error(error);
@@ -216,11 +167,11 @@ app.post('/api/documentTranslator', upload.single('file'), async (req, res) => {
     req.file.buffer = null;
 
   } catch (error) {
-    console.log(error)
+    console.log(error.err)
     res.status(500).json({ message: `${error} Try again later` })
   }
 
 })
 
-
-app.listen(5000, () => console.log("Listening on port 5000"));
+const port = process.env.PORT || 8080;
+app.listen(port, () => console.log(`Listening on port ${port}`));
